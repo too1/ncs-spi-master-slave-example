@@ -32,19 +32,30 @@
 const struct device *spi_dev;
 static struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
 
+struct spi_cs_control spim_cs = {
+	.gpio_pin = 28,
+	.gpio_dt_flags = GPIO_ACTIVE_LOW,
+	.delay = 0,
+};
+
 static void spi_init(void)
 {
 	spi_dev = device_get_binding("SPI_1");
 	if(spi_dev == NULL){
 		printk("Error getting SPI master device!!\n");
 	}
+	spim_cs.gpio_dev = device_get_binding("GPIO_0");
+	if(spim_cs.gpio_dev == NULL){
+		printk("Unable to get GPIO0 device binding for SPI CS!\n");
+	}
 }
 
 static const struct spi_config spi_cfg = {
 	.operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
-		     SPI_MODE_CPOL | SPI_MODE_CPHA,
+				 SPI_MODE_CPOL | SPI_MODE_CPHA,
 	.frequency = 4000000,
 	.slave = 0,
+	.cs = &spim_cs,
 };
 
 
@@ -101,14 +112,14 @@ static struct k_poll_signal spi_slave_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_s
 
 static const struct spi_config spi_slave_cfg = {
 	.operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
-		     SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_OP_MODE_SLAVE,
+				 SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_OP_MODE_SLAVE,
 	.frequency = 4000000,
 	.slave = 0,
 };
 
 static void spi_slave_init(void)
 {
-	spi_slave_dev = device_get_binding("SPI_0");
+	spi_slave_dev = device_get_binding("SPI_2");
 	if(spi_slave_dev == NULL){
 		printk("Error getting SPI slave device!!\n");
 	}
@@ -152,7 +163,6 @@ static int spi_slave_write_test_msg(void)
 		printk("SPI slave transceive error: %i\n", error);
 		return error;
 	}
-
 	return 0;
 }
 
