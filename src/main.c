@@ -28,25 +28,30 @@
 #define FLAGS	0
 #endif
 
+#define MY_SPI_MASTER 			DT_LABEL(DT_NODELABEL(my_spi_master))
+#define MY_SPI_MASTER_CS_PORT	DT_SPI_DEV_CS_GPIOS_LABEL(DT_NODELABEL(reg_my_spi_master))
+#define MY_SPI_MASTER_CS_PIN	DT_SPI_DEV_CS_GPIOS_PIN(DT_NODELABEL(reg_my_spi_master))
+#define MY_SPI_MASTER_REG		DT_REG_ADDR(DT_NODELABEL(reg_my_spi_master))
+
 // SPI master functionality
 const struct device *spi_dev;
 static struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
 
 struct spi_cs_control spim_cs = {
-	.gpio_pin = 28,
+	.gpio_pin = MY_SPI_MASTER_CS_PIN,
 	.gpio_dt_flags = GPIO_ACTIVE_LOW,
 	.delay = 0,
 };
 
 static void spi_init(void)
 {
-	spi_dev = device_get_binding("SPI_1");
+	spi_dev = device_get_binding(MY_SPI_MASTER);
 	if(spi_dev == NULL){
-		printk("Error getting SPI master device!!\n");
+		printk("Error getting device %s\n", MY_SPI_MASTER);
 	}
-	spim_cs.gpio_dev = device_get_binding("GPIO_0");
+	spim_cs.gpio_dev = device_get_binding(MY_SPI_MASTER_CS_PORT);
 	if(spim_cs.gpio_dev == NULL){
-		printk("Unable to get GPIO0 device binding for SPI CS!\n");
+		printk("Unable to get device binding for SPI CS!\n");
 	}
 }
 
@@ -197,7 +202,7 @@ void main(void)
 	spi_slave_init();
 
 	printk("SPI master/slave example started\n");
-
+	
 	spi_slave_write_test_msg();
 
 	while (1) {
