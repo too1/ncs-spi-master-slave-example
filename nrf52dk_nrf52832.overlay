@@ -1,18 +1,21 @@
-&spi1 {
-  compatible = "nordic,nrf-spi";
-  status = "okay";
-  sck-pin = <31>;
-  mosi-pin = <30>;
-  miso-pin = <29>;
-  cs-gpios = <&gpio0 28 GPIO_ACTIVE_LOW>;
+my_spi_master: &spi1 {
+	compatible = "nordic,nrf-spi";
+	status = "okay";
+	sck-pin = <31>;
+	mosi-pin = <30>;
+	miso-pin = <29>;
+	cs-gpios = <&gpio0 28 GPIO_ACTIVE_LOW>;
+	reg_my_spi_master: spi-dev-a@0 {
+		reg = <0>;
+	};
 };
 
 &spi2 {
-  compatible = "nordic,nrf-spis";
-  status = "okay";
-  sck-pin = <11>;
-  mosi-pin = <12>;
-  miso-pin = <13>;
-  csn-pin = <14>;
-  def-char = <0x00>;
+	compatible = "nordic,nrf-spis";
+	status = "okay";
+	sck-pin = <11>;
+	mosi-pin = <12>;
+	miso-pin = <13>;
+	csn-pin = <14>;
+	def-char = <0x00>;
 };
