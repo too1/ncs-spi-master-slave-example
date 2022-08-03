@@ -1,44 +1,23 @@
-.. _blinky-sample:
-
-Blinky
-######
+NCS-SPI-Master-Slave-Example
+############################
 
 Overview
 ********
+This example shows how to use the SPI master and slave async drivers in Zephyr, and sets up a separate master and slave interface in order to allow sending data from the master to the slave and vice versa. 
 
-Blinky is a simple application which blinks an LED forever using the :ref:`GPIO
-API <gpio_api>`. The source code shows how to configure GPIO pins as outputs,
-then turn them on and off.
+The SPI bus lines needs to be externally connected between the master and slave pins in order to test communication between them.
+ 
+The SPI master will send a 2 byte transaction every second, including an incrementing counter, and check if anything is received on the SPI slave interface. 
 
-See :ref:`pwm-blinky-sample` for a sample which uses the PWM API to blink an
-LED.
-
-.. _blinky-sample-requirements:
+Any sent or received data on the SPI master and slave will be printed to the terminal. 
 
 Requirements
 ************
 
-You will see this error if you try to build Blinky for an unsupported board:
-
-.. code-block:: none
-
-   Unsupported board: led0 devicetree alias is not defined
-
-The board must have an LED connected via a GPIO pin. These are called "User
-LEDs" on many of Zephyr's :ref:`boards`. The LED must be configured using the
-``led0`` :ref:`devicetree <dt-guide>` alias. This is usually done in the
-:ref:`BOARD.dts file <devicetree-in-out-files>` or a :ref:`devicetree overlay
-<set-devicetree-overlays>`.
-
-Building and Running
-********************
-
-Build and flash Blinky as follows, changing ``reel_board`` for your board:
-
-.. zephyr-app-commands::
-   :zephyr-app: samples/basic/blinky
-   :board: reel_board
-   :goals: build flash
-   :compact:
-
-After flashing, the LED starts to blink. Blinky does not print to the console.
+SDK: 
+	- nRF Connect SDK v1.9.1
+	
+Supported boards: 
+	- nrf52dk_nrf52832
+	- nrf52840dk_nrf52840
+	- nrf5340dk_nrf5340_cpuapp
