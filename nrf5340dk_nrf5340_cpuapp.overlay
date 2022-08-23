@@ -47,7 +47,7 @@ my_spi_master: &spi4 {
 	};
 };
 
-&spi2 {
+my_spi_slave: &spi2 {
 	compatible = "nordic,nrf-spis";
 	status = "okay";
 	pinctrl-0 = <&spi2_default>;

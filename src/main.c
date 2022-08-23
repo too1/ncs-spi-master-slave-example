@@ -33,6 +33,8 @@
 #define MY_SPI_MASTER_CS_PIN	DT_SPI_DEV_CS_GPIOS_PIN(DT_NODELABEL(reg_my_spi_master))
 #define MY_SPI_MASTER_REG		DT_REG_ADDR(DT_NODELABEL(reg_my_spi_master))
 
+#define MY_SPI_SLAVE			DT_LABEL(DT_NODELABEL(my_spi_slave))
+
 // SPI master functionality
 const struct device *spi_dev;
 static struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
@@ -127,7 +129,7 @@ static const struct spi_config spi_slave_cfg = {
 
 static void spi_slave_init(void)
 {
-	spi_slave_dev = device_get_binding("SPI_2");
+	spi_slave_dev = device_get_binding(MY_SPI_SLAVE);
 	if(spi_slave_dev == NULL){
 		printk("Error getting SPI slave device!!\n");
 	}
