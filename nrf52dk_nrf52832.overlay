@@ -1,9 +1,46 @@
+&pinctrl {
+	spi1_default: spi1_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 30)>,
+					<NRF_PSEL(SPIM_MISO, 0, 29)>;
+		};
+	};
+
+	spi1_sleep: spi1_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 30)>,
+					<NRF_PSEL(SPIM_MISO, 0, 29)>;
+			low-power-enable;
+		};
+	};
+
+	spi2_default: spi2_default {
+		group1 {
+			psels = <NRF_PSEL(SPIS_SCK, 0, 11)>,
+					<NRF_PSEL(SPIS_MOSI, 0, 12)>,
+					<NRF_PSEL(SPIS_MISO, 0, 13)>,
+					<NRF_PSEL(SPIS_CSN, 0, 14)>;
+		};
+	};
+
+	spi2_sleep: spi2_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIS_SCK, 0, 11)>,
+					<NRF_PSEL(SPIS_MOSI, 0, 12)>,
+					<NRF_PSEL(SPIS_MISO, 0, 13)>,
+					<NRF_PSEL(SPIS_CSN, 0, 14)>;
+			low-power-enable;
+		};
+	};
+};
+
 my_spi_master: &spi1 {
 	compatible = "nordic,nrf-spi";
 	status = "okay";
-	sck-pin = <31>;
-	mosi-pin = <30>;
-	miso-pin = <29>;
+	pinctrl-0 = <&spi1_default>;
+	pinctrl-1 = <&spi1_sleep>;
 	cs-gpios = <&gpio0 28 GPIO_ACTIVE_LOW>;
 	reg_my_spi_master: spi-dev-a@0 {
 		reg = <0>;
@@ -13,9 +50,7 @@ my_spi_master: &spi1 {
 &spi2 {
 	compatible = "nordic,nrf-spis";
 	status = "okay";
-	sck-pin = <11>;
-	mosi-pin = <12>;
-	miso-pin = <13>;
-	csn-pin = <14>;
+	pinctrl-0 = <&spi2_default>;
+	pinctrl-1 = <&spi2_sleep>;
 	def-char = <0x00>;
 };

@@ -37,10 +37,14 @@
 const struct device *spi_dev;
 static struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
 
-struct spi_cs_control spim_cs = {
+/*struct spi_cs_control spim_cs = {
 	.gpio_pin = MY_SPI_MASTER_CS_PIN,
 	.gpio_dt_flags = GPIO_ACTIVE_LOW,
 	.delay = 0,
+};*/
+struct spi_cs_control spim_cs = {
+	.gpio.pin = MY_SPI_MASTER_CS_PIN,
+	.gpio.dt_flags = GPIO_ACTIVE_LOW,
 };
 
 static void spi_init(void)
@@ -49,8 +53,8 @@ static void spi_init(void)
 	if(spi_dev == NULL){
 		printk("Error getting device %s\n", MY_SPI_MASTER);
 	}
-	spim_cs.gpio_dev = device_get_binding(MY_SPI_MASTER_CS_PORT);
-	if(spim_cs.gpio_dev == NULL){
+	spim_cs.gpio.port = device_get_binding(MY_SPI_MASTER_CS_PORT);
+	if(spim_cs.gpio.port == NULL){
 		printk("Unable to get device binding for SPI CS!\n");
 	}
 }
@@ -62,7 +66,6 @@ static const struct spi_config spi_cfg = {
 	.slave = 0,
 	.cs = &spim_cs,
 };
-
 
 static int spi_write_test_msg(void)
 {
