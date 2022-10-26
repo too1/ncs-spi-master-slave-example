@@ -16,18 +16,6 @@
 /* The devicetree node identifier for the "led0" alias. */
 #define LED0_NODE DT_ALIAS(led0)
 
-#if DT_NODE_HAS_STATUS(LED0_NODE, okay)
-#define LED0	DT_GPIO_LABEL(LED0_NODE, gpios)
-#define PIN	DT_GPIO_PIN(LED0_NODE, gpios)
-#define FLAGS	DT_GPIO_FLAGS(LED0_NODE, gpios)
-#else
-/* A build error here means your board isn't set up to blink an LED. */
-#error "Unsupported board: led0 devicetree alias is not defined"
-#define LED0	""
-#define PIN	0
-#define FLAGS	0
-#endif
-
 #define MY_SPI_MASTER 			DT_LABEL(DT_NODELABEL(my_spi_master))
 #define MY_SPI_MASTER_CS_PORT	DT_SPI_DEV_CS_GPIOS_LABEL(DT_NODELABEL(reg_my_spi_master))
 #define MY_SPI_MASTER_CS_PIN	DT_SPI_DEV_CS_GPIOS_PIN(DT_NODELABEL(reg_my_spi_master))
@@ -186,18 +174,22 @@ static int spi_slave_check_for_message(void)
 	else return -1;
 }
 
+/*
+ * A build error on this line means your board is unsupported.
+ * See the sample documentation for information on how to fix this.
+ */
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
 void main(void)
 {
 	const struct device *dev;
-	bool led_is_on = true;
 	int ret;
 
-	dev = device_get_binding(LED0);
-	if (dev == NULL) {
+	if (!device_is_ready(led.port)) {
 		return;
 	}
 
-	ret = gpio_pin_configure(dev, PIN, GPIO_OUTPUT_ACTIVE | FLAGS);
+	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
 	if (ret < 0) {
 		return;
 	}
@@ -212,8 +204,10 @@ void main(void)
 
 	while (1) {
 		spi_write_test_msg();
-		gpio_pin_set(dev, PIN, (int)led_is_on);
-		led_is_on = !led_is_on;
+		ret = gpio_pin_toggle_dt(&led);
+		if (ret < 0) {
+			return;
+		}
 		k_msleep(SLEEP_TIME_MS);
 
 		if(spi_slave_check_for_message() == 0){
