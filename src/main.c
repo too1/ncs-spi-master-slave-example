@@ -16,36 +16,27 @@
 /* The devicetree node identifier for the "led0" alias. */
 #define LED0_NODE DT_ALIAS(led0)
 
-#define MY_SPI_MASTER 			DT_LABEL(DT_NODELABEL(my_spi_master))
-#define MY_SPI_MASTER_CS_PORT	DT_SPI_DEV_CS_GPIOS_LABEL(DT_NODELABEL(reg_my_spi_master))
-#define MY_SPI_MASTER_CS_PIN	DT_SPI_DEV_CS_GPIOS_PIN(DT_NODELABEL(reg_my_spi_master))
-#define MY_SPI_MASTER_REG		DT_REG_ADDR(DT_NODELABEL(reg_my_spi_master))
+#define MY_SPI_MASTER DT_NODELABEL(my_spi_master)
 
-#define MY_SPI_SLAVE			DT_LABEL(DT_NODELABEL(my_spi_slave))
+#define MY_SPI_SLAVE  DT_NODELABEL(my_spi_slave)
 
 // SPI master functionality
 const struct device *spi_dev;
 static struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
 
-/*struct spi_cs_control spim_cs = {
-	.gpio_pin = MY_SPI_MASTER_CS_PIN,
-	.gpio_dt_flags = GPIO_ACTIVE_LOW,
-	.delay = 0,
-};*/
 struct spi_cs_control spim_cs = {
-	.gpio.pin = MY_SPI_MASTER_CS_PIN,
-	.gpio.dt_flags = GPIO_ACTIVE_LOW,
+	.gpio = SPI_CS_GPIOS_DT_SPEC_GET(DT_NODELABEL(reg_my_spi_master)),
+	.delay = 0,
 };
 
 static void spi_init(void)
 {
-	spi_dev = device_get_binding(MY_SPI_MASTER);
-	if(spi_dev == NULL){
-		printk("Error getting device %s\n", MY_SPI_MASTER);
+	spi_dev = DEVICE_DT_GET(MY_SPI_MASTER);
+	if(device_is_ready(spi_dev) != 0) {
+		printk("SPI master device not ready!\n");
 	}
-	spim_cs.gpio.port = device_get_binding(MY_SPI_MASTER_CS_PORT);
-	if(spim_cs.gpio.port == NULL){
-		printk("Unable to get device binding for SPI CS!\n");
+	if(device_is_ready(spim_cs.gpio.port) != 0){
+		printk("SPI master chip select device not ready!\n");
 	}
 }
 
@@ -117,9 +108,9 @@ static const struct spi_config spi_slave_cfg = {
 
 static void spi_slave_init(void)
 {
-	spi_slave_dev = device_get_binding(MY_SPI_SLAVE);
-	if(spi_slave_dev == NULL){
-		printk("Error getting SPI slave device!!\n");
+	spi_slave_dev = DEVICE_DT_GET(MY_SPI_SLAVE);
+	if(device_is_ready(spi_dev) != 0) {
+		printk("SPI slave device not ready!\n");
 	}
 }
 
@@ -182,7 +173,6 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
 void main(void)
 {
-	const struct device *dev;
 	int ret;
 
 	if (!device_is_ready(led.port)) {
