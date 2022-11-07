@@ -32,10 +32,10 @@ struct spi_cs_control spim_cs = {
 static void spi_init(void)
 {
 	spi_dev = DEVICE_DT_GET(MY_SPI_MASTER);
-	if(device_is_ready(spi_dev) != 0) {
+	if(!device_is_ready(spi_dev)) {
 		printk("SPI master device not ready!\n");
 	}
-	if(device_is_ready(spim_cs.gpio.port) != 0){
+	if(!device_is_ready(spim_cs.gpio.port)){
 		printk("SPI master chip select device not ready!\n");
 	}
 }
@@ -109,7 +109,7 @@ static const struct spi_config spi_slave_cfg = {
 static void spi_slave_init(void)
 {
 	spi_slave_dev = DEVICE_DT_GET(MY_SPI_SLAVE);
-	if(device_is_ready(spi_dev) != 0) {
+	if(!device_is_ready(spi_dev)) {
 		printk("SPI slave device not ready!\n");
 	}
 }
