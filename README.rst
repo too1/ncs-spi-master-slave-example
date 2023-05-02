@@ -19,5 +19,6 @@ SDK:
 	
 Supported boards: 
 	- nrf52dk_nrf52832
+	- nrf52833dk_nrf52833
 	- nrf52840dk_nrf52840
 	- nrf5340dk_nrf5340_cpuapp
