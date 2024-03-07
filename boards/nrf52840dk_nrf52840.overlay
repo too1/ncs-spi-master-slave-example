@@ -1,0 +1,63 @@
+&pinctrl {
+	spi_master_default: spi_master_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 30)>,
+					<NRF_PSEL(SPIM_MISO, 0, 29)>;
+		};
+	};
+
+	spi_master_sleep: spi_master_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 30)>,
+					<NRF_PSEL(SPIM_MISO, 0, 29)>;
+			low-power-enable;
+		};
+	};
+
+	spi_slave_default: spi_slave_default {
+		group1 {
+			psels = <NRF_PSEL(SPIS_SCK, 1, 1)>,
+					<NRF_PSEL(SPIS_MOSI, 1, 2)>,
+					<NRF_PSEL(SPIS_MISO, 1, 3)>,
+					<NRF_PSEL(SPIS_CSN, 1, 4)>;
+		};
+	};
+
+	spi_slave_sleep: spi_slave_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIS_SCK, 1, 1)>,
+					<NRF_PSEL(SPIS_MOSI, 1, 2)>,
+					<NRF_PSEL(SPIS_MISO, 1, 3)>,
+					<NRF_PSEL(SPIS_CSN, 1, 4)>;
+			low-power-enable;
+		};
+	};
+};
+
+my_spi_master: &spi3 {
+	compatible = "nordic,nrf-spim";
+	status = "okay";
+	pinctrl-0 = <&spi_master_default>;
+	pinctrl-1 = <&spi_master_sleep>;
+	pinctrl-names = "default", "sleep";
+	cs-gpios = <&gpio0 28 GPIO_ACTIVE_LOW>;
+	reg_my_spi_master: spi-dev-a@0 {
+		reg = <0>;
+	};
+};
+
+my_spi_slave: &spi1 {
+	compatible = "nordic,nrf-spis";
+	status = "okay";
+	pinctrl-0 = <&spi_slave_default>;
+	pinctrl-1 = <&spi_slave_sleep>;
+	pinctrl-names = "default", "sleep";
+	def-char = <0x00>;
+};
+
+// By default uart1 will occupy P1.01 and P1.02. In order to make these pins available, disable uart1
+&uart1 {
+	status="disabled";
+};

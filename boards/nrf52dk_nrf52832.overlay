@@ -1,0 +1,58 @@
+&pinctrl {
+	spi_master_default: spi_master_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 30)>,
+					<NRF_PSEL(SPIM_MISO, 0, 29)>;
+		};
+	};
+
+	spi_master_sleep: spi_master_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 30)>,
+					<NRF_PSEL(SPIM_MISO, 0, 29)>;
+			low-power-enable;
+		};
+	};
+
+	spi_slave_default: spi_slave_default {
+		group1 {
+			psels = <NRF_PSEL(SPIS_SCK, 0, 11)>,
+					<NRF_PSEL(SPIS_MOSI, 0, 12)>,
+					<NRF_PSEL(SPIS_MISO, 0, 13)>,
+					<NRF_PSEL(SPIS_CSN, 0, 14)>;
+		};
+	};
+
+	spi_slave_sleep: spi_slave_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIS_SCK, 0, 11)>,
+					<NRF_PSEL(SPIS_MOSI, 0, 12)>,
+					<NRF_PSEL(SPIS_MISO, 0, 13)>,
+					<NRF_PSEL(SPIS_CSN, 0, 14)>;
+			low-power-enable;
+		};
+	};
+};
+
+my_spi_master: &spi1 {
+	compatible = "nordic,nrf-spi";
+	status = "okay";
+	pinctrl-0 = <&spi_master_default>;
+	pinctrl-1 = <&spi_master_sleep>;
+	pinctrl-names = "default", "sleep";
+	cs-gpios = <&gpio0 28 GPIO_ACTIVE_LOW>;
+	reg_my_spi_master: spi-dev-a@0 {
+		reg = <0>;
+	};
+};
+
+my_spi_slave: &spi2 {
+	compatible = "nordic,nrf-spis";
+	status = "okay";
+	pinctrl-0 = <&spi_slave_default>;
+	pinctrl-1 = <&spi_slave_sleep>;
+	pinctrl-names = "default", "sleep";
+	def-char = <0x00>;
+};
