@@ -15,7 +15,7 @@ Requirements
 ************
 
 SDK: 
-	- nRF Connect SDK v2.3.0
+	- nRF Connect SDK v2.5.2
 	
 Supported boards: 
 	- nrf52dk_nrf52832

@@ -17,6 +17,7 @@
 #define LED0_NODE DT_ALIAS(led0)
 
 #define MY_SPI_MASTER DT_NODELABEL(my_spi_master)
+#define MY_SPI_MASTER_CS_DT_SPEC SPI_CS_GPIOS_DT_SPEC_GET(DT_NODELABEL(reg_my_spi_master))
 
 #define MY_SPI_SLAVE  DT_NODELABEL(my_spi_slave)
 
@@ -24,28 +25,23 @@
 const struct device *spi_dev;
 static struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
 
-struct spi_cs_control spim_cs = {
-	.gpio = SPI_CS_GPIOS_DT_SPEC_GET(DT_NODELABEL(reg_my_spi_master)),
-	.delay = 0,
-};
-
 static void spi_init(void)
 {
 	spi_dev = DEVICE_DT_GET(MY_SPI_MASTER);
 	if(!device_is_ready(spi_dev)) {
 		printk("SPI master device not ready!\n");
 	}
-	if(!device_is_ready(spim_cs.gpio.port)){
+	struct gpio_dt_spec spim_cs_gpio = MY_SPI_MASTER_CS_DT_SPEC;
+	if(!device_is_ready(spim_cs_gpio.port)){
 		printk("SPI master chip select device not ready!\n");
 	}
 }
 
-static const struct spi_config spi_cfg = {
-	.operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
-				 SPI_MODE_CPOL | SPI_MODE_CPHA,
+static struct spi_config spi_cfg = {
+	.operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB | SPI_MODE_CPOL | SPI_MODE_CPHA,
 	.frequency = 4000000,
 	.slave = 0,
-	.cs = &spim_cs,
+	.cs = {.gpio = MY_SPI_MASTER_CS_DT_SPEC, .delay = 0},
 };
 
 static int spi_write_test_msg(void)
@@ -171,17 +167,17 @@ static int spi_slave_check_for_message(void)
  */
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
-void main(void)
+int main(void)
 {
 	int ret;
 
 	if (!device_is_ready(led.port)) {
-		return;
+		return 0;
 	}
 
 	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
 	if (ret < 0) {
-		return;
+		return 0;
 	}
 
 	spi_init();
@@ -196,7 +192,7 @@ void main(void)
 		spi_write_test_msg();
 		ret = gpio_pin_toggle_dt(&led);
 		if (ret < 0) {
-			return;
+			return 0;
 		}
 		k_msleep(SLEEP_TIME_MS);
 
@@ -208,4 +204,6 @@ void main(void)
 			spi_slave_write_test_msg();
 		}
 	}
+
+	return 0;
 }
