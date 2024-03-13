@@ -76,7 +76,7 @@ static int spi_write_test_msg(void)
 	k_poll_signal_reset(&spi_done_sig);
 	
 	// Start transaction
-	int error = spi_transceive_async(spi_dev, &spi_cfg, &tx, &rx, &spi_done_sig);
+	int error = spi_transceive_signal(spi_dev, &spi_cfg, &tx, &rx, &spi_done_sig);
 	if(error != 0){
 		printk("SPI transceive error: %i\n", error);
 		return error;
@@ -143,7 +143,7 @@ static int spi_slave_write_test_msg(void)
 	k_poll_signal_reset(&spi_slave_done_sig);
 	
 	// Start transaction
-	int error = spi_transceive_async(spi_slave_dev, &spi_slave_cfg, &s_tx, &s_rx, &spi_slave_done_sig);
+	int error = spi_transceive_signal(spi_slave_dev, &spi_slave_cfg, &s_tx, &s_rx, &spi_slave_done_sig);
 	if(error != 0){
 		printk("SPI slave transceive error: %i\n", error);
 		return error;
