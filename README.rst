@@ -22,3 +22,4 @@ Supported boards:
 	- nrf52833dk_nrf52833
 	- nrf52840dk_nrf52840
 	- nrf5340dk_nrf5340_cpuapp
+	- nrf5340_audio_dk_nrf5340_cpuapp
